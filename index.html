@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Makecode Arcade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* Global Resets and Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #000000; /* Preto */
+            color: #FFFFFF; /* Branco */
+            font-family: 'Press Start 2P', cursive; /* Universal Font */
+            padding-top: 105px; /* 70px * 1.5 -> Space for sticky header */
+            line-height: 1.6;
+            font-size: 15px; /* 10px * 1.5 -> Base for responsive sizing */
+        }
+
+        /* Sticky Header Navigation */
+        .sticky-header {
+            background-color: #0D0D0D; /* Darker than content bg */
+            padding: 15px 0; /* 10px * 1.5 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            border-bottom: 5px solid #39FF14; /* 3px * 1.5 (rounded) -> Neon Green */
+            box-shadow: 0 3px 15px rgba(57, 255, 20, 0.3); /* 0 (2px*1.5) (10px*1.5) */
+        }
+
+        .sticky-header nav ul {
+            list-style-type: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap; /* Allow nav items to wrap on smaller screens */
+        }
+
+        .sticky-header nav ul li {
+            margin: 8px 15px; /* (5px*1.5 rounded) (10px*1.5) */
+        }
+
+        .sticky-header nav ul li a {
+            color: #FFFFFF;
+            text-decoration: none;
+            font-size: 1.2em; /* Responsive font size, scales with body font-size */
+            padding: 12px 18px; /* (8px*1.5) (12px*1.5) */
+            border-radius: 8px; /* 5px * 1.5 (rounded) */
+            transition: background-color 0.3s, color 0.3s;
+            white-space: nowrap; /* Prevent link text from breaking */
+        }
+
+        .sticky-header nav ul li a:hover,
+        .sticky-header nav ul li a.active {
+            background-color: #39FF14; /* Neon Green */
+            color: #000000; /* Black text on hover */
+            text-shadow: 1px 1px #FF0000; /* Red shadow - text-shadow doesn't scale well with font-size directly, might need adjustment if it looks off */
+        }
+
+        /* General Container for Content Sections */
+        .container {
+            max-width: 900px; /* Max width maintained, content inside will scale */
+            margin: 30px auto; /* 20px * 1.5 */
+            background-color: rgba(10, 10, 10, 0.85);
+            padding: 30px 45px; /* (20px*1.5) (30px*1.5) */
+            border-radius: 22px; /* 15px * 1.5 (rounded) */
+            border: 3px solid #39FF14; /* 2px * 1.5 -> Borda Verde Neon */
+        }
+
+        /* Headings */
+        h1, h2, h3, h4 {
+            font-family: 'Press Start 2P', cursive;
+            text-shadow: 2px 2px #FF0000; /* Sombra Vermelha - text-shadow px values might need adjustment if they look off */
+        }
+
+        h1 {
+            color: #39FF14; /* Verde Neon */
+            text-align: center;
+            font-size: 2.2em; /* Responsive, scales with body font-size */
+            margin-bottom: 45px; /* 30px * 1.5 */
+        }
+
+        h2 {
+            color: #00FFFF; /* Azul Neon Ciano */
+            font-size: 1.8em; /* Responsive */
+            margin-top: 60px; /* 40px * 1.5 */
+            margin-bottom: 30px; /* 20px * 1.5 */
+            border-bottom: 5px dashed #39FF14; /* 3px * 1.5 (rounded) -> Verde Neon */
+            padding-bottom: 15px; /* 10px * 1.5 */
+        }
+
+        h3 {
+            color: #DA70D6; /* Roxo Neon (Orchid) */
+            font-size: 1.4em; /* Responsive */
+            margin-top: 45px; /* 30px * 1.5 */
+            margin-bottom: 22px; /* 15px * 1.5 (rounded) */
+        }
+
+        h4 {
+            color: #FF1F69; /* Vermelho Neon (Fiery Rose) */
+            font-size: 1.2em; /* Responsive */
+            margin-top: 30px; /* 20px * 1.5 */
+            margin-bottom: 15px; /* 10px * 1.5 */
+        }
+
+        p, li {
+            font-size: 1.1em; /* Responsive */
+            color: #E0E0E0; /* Branco Suave */
+        }
+         /* Reduce size for nested li for readability */
+        li li {
+            font-size: 0.95em; /* This will also scale relative to its parent li */
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        /* Styling for main page mission lists */
+        #pagina-inicial li, #lojinha li, #placar li:not(th li):not(td li) {
+            background-color: rgba(30, 30, 30, 0.7);
+            margin-bottom: 15px; /* 10px * 1.5 */
+            padding: 22px; /* 15px * 1.5 (rounded) */
+            border-radius: 12px; /* 8px * 1.5 */
+            border-left: 8px solid #39FF14; /* 5px * 1.5 (rounded) -> Verde Neon */
+        }
+        
+        #pagina-inicial li > ul, #lojinha li > ul {
+            margin-top: 15px; /* 10px * 1.5 */
+            margin-bottom: 0;
+            padding-left: 30px; /* 20px * 1.5 */
+        }
+
+        #pagina-inicial li > ul > li, #lojinha li > ul > li {
+            background-color: rgba(40, 40, 40, 0.7);
+            border-left: 5px solid #00FFFF; /* 3px * 1.5 (rounded) */
+            padding: 15px; /* 10px * 1.5 */
+            font-size: 0.95em; /* Slightly smaller for sub-tasks */
+        }
+        
+        #pagina-inicial li > ul > li:last-child, #lojinha li > ul > li:last-child {
+            margin-bottom: 0;
+        }
+
+        #pagina-inicial li strong, #lojinha li strong {
+            color: #00FFFF; /* Azul Neon Ciano */
+        }
+        
+        #pagina-inicial li > strong.role-title {
+             display: block;
+             margin-bottom: 8px; /* 5px * 1.5 (rounded) */
+        }
+
+        .points {
+            font-family: 'Press Start 2P', cursive;
+            color: #FFD700; /* Dourado para pontos */
+            font-size: 0.9em; /* Responsive */
+        }
+
+        .role-designer { color: #39FF14 !important; }
+        .role-manager { color: #00FFFF !important; }
+        .role-presenter { color: #DA70D6 !important; }
+        .role-programmer { color: #FF1F69 !important; }
+        .role-all { color: #FFA500 !important; }
+
+        .shop-item { 
+            background-color: rgba(50, 0, 70, 0.7);
+            border-left: 8px solid #DA70D6; /* 5px * 1.5 (rounded) */
+            padding: 30px; /* 20px * 1.5 */
+        }
+
+        .shop-item strong {
+            color: #39FF14;
+        }
+
+        .shop-points {
+            font-family: 'Press Start 2P', cursive;
+            color: #FFD700;
+            font-size: 1em; /* Responsive */
+            display: block;
+            margin-top: 8px; /* 5px * 1.5 (rounded) */
+        }
+
+        hr {
+            border: 0;
+            height: 3px; /* 2px * 1.5 */
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), #39FF14, rgba(0, 0, 0, 0));
+            margin: 60px 0; /* 40px * 1.5 */
+        }
+
+        .role-icon {
+            margin-right: 12px; /* 8px * 1.5 */
+            font-size: 1.2em; /* Responsive */
+        }
+
+        /* Styles for Mission Cards Page */
+        .mission-card {
+            background-color: rgba(30, 30, 30, 0.85);
+            margin-bottom: 30px; /* 20px * 1.5 */
+            padding: 30px; /* 20px * 1.5 */
+            border-radius: 15px; /* 10px * 1.5 */
+            border-left: 10px solid #39FF14; /* 7px * 1.5 (rounded down) */
+            border-right: 3px solid #39FF14; /* 2px * 1.5 */
+            border-top: 3px solid #39FF14; /* 2px * 1.5 */
+            border-bottom: 3px solid #39FF14; /* 2px * 1.5 */
+            box-shadow: 0 0 22px rgba(57, 255, 20, 0.3); /* 0 0 (15px*1.5 rounded) */
+        }
+
+        .mission-card h3 { 
+            color: #DA70D6; 
+            font-size: 1.3em; 
+            margin-top: 0;
+            margin-bottom: 22px; /* 15px * 1.5 (rounded) */
+        }
+
+        .mission-card p {
+            font-size: 1em; 
+            color: #E0E0E0;
+            margin-bottom: 12px; /* 8px * 1.5 */
+        }
+
+        .mission-card strong { 
+            color: #00FFFF;
+        }
+        
+        .mission-card .points { 
+            text-align: right;
+            display: block; 
+            margin-top: 15px; /* 10px * 1.5 */
+            color: #FFD700; 
+        }
+
+
+        /* Controls Panel (Shared by Mission Cards and Placar) */
+        .controls-panel {
+            background-color: rgba(20, 20, 20, 0.9);
+            padding: 22px;  /* 15px * 1.5 (rounded) */
+            margin-bottom: 45px; /* 30px * 1.5 */
+            border-radius: 15px; /* 10px * 1.5 */
+            border: 3px solid #00FFFF; /* 2px * 1.5 */
+            text-align: center;
+            box-shadow: 0 0 22px rgba(0, 255, 255, 0.3); /* 0 0 (15px*1.5 rounded) */
+        }
+        .controls-panel h4 {
+            margin-top: 0;
+            margin-bottom: 22px;  /* 15px * 1.5 (rounded) */
+            color: #39FF14;
+            font-size: 1.4em; 
+        }
+        .control-btn, .control-select {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #39FF14;
+            color: #000000;
+            border: 3px solid #000000; /* 2px * 1.5 */
+            padding: 12px 15px;  /* (8px*1.5) (10px*1.5) */
+            margin: 8px;  /* 5px * 1.5 (rounded) */
+            border-radius: 12px; /* 8px * 1.5 */
+            cursor: pointer;
+            font-size: 0.7em; 
+            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+            text-shadow: none;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.4); /* (0 2px*1.5 5px*1.5) */
+        }
+        .control-btn:hover, .control-select:hover {
+            background-color: #DA70D6;
+            color: #FFFFFF;
+            box-shadow: 0 0 15px #DA70D6, 0 0 6px #FFFFFF;  /* (0 0 10px*1.5), (0 0 4px*1.5) */
+            transform: translateY(-2px); /* -1px * 1.5 (or just a bit more pronounced) */
+        }
+        .control-btn.active { /* For role filters */
+            background-color: #FF1F69;
+            color: #FFFFFF;
+            border-color: #FFFFFF;
+            box-shadow: 0 0 15px #FF1F69;  /* (0 0 10px*1.5) */
+        }
+        .control-select.active-filter { /* For turma filter select */
+            border-color: #FFD700; /* Gold to indicate active filter */
+            box-shadow: 0 0 15px #FFD700; /* (0 0 10px*1.5) */
+        }
+        .control-select {
+            padding: 14px 12px;  /* (9px*1.5 rounded) (8px*1.5) */
+        }
+
+        .controls-panel > div:not(.control-group) { /* For role filter buttons container */
+            margin-top: 22px;  /* 15px * 1.5 (rounded) */
+            padding-top: 15px;  /* 10px * 1.5 */
+            border-top: 3px dashed #00FFFF; /* 2px * 1.5 */
+        }
+        .controls-panel > div p { /* Text "Mostrar/Esconder por Função:" */
+            color: #00FFFF;
+            font-size: 0.9em; 
+            margin-bottom: 12px;  /* 8px * 1.5 */
+        }
+        .control-group { /* For select dropdowns */
+            margin-bottom: 15px;  /* 10px * 1.5 */
+        }
+        .control-group label {
+            color: #FFFFFF;
+            font-size: 0.85em; 
+            margin-right: 12px;  /* 8px * 1.5 */
+        }
+
+        /* Placar Styles */
+        #placar table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px; /* 20px * 1.5 */
+            font-size: 1.1em; 
+        }
+        #placar th, #placar td {
+            border: 3px solid #39FF14;  /* 2px * 1.5 */
+            padding: 15px 22px; /* (10px*1.5) (15px*1.5 rounded) */
+            text-align: left;
+        }
+        #placar th {
+            background-color: #FF1F69; 
+            color: #FFFFFF;
+            font-size: 1.2em; 
+        }
+        #placar td {
+            background-color: rgba(30, 30, 30, 0.7);
+            color: #E0E0E0; 
+        }
+        #placar .team-name {
+            color: #00FFFF; 
+        }
+        #placar .team-score {
+            color: #FFD700; 
+            font-weight: bold;
+        }
+        #placar .team-turma {
+            font-size: 0.8em;
+            color: #AAAAAA;
+        }
+
+
+        /* Content Section Visibility */
+        .content-section {
+            display: none; /* Hidden by default */
+        }
+        .content-section.active {
+            display: block; /* Shown when active */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            body {
+                font-size: 13.5px; /* 9px * 1.5 */
+                padding-top: 90px;  /* 60px * 1.5 */
+            }
+            .sticky-header nav ul li a {
+                font-size: 1.1em; 
+                padding: 9px 15px; /* (6px*1.5) (10px*1.5) */
+            }
+            h1 { font-size: 2em; }
+            h2 { font-size: 1.6em; }
+            h3 { font-size: 1.3em; }
+            h4 { font-size: 1.1em; }
+            p, li { font-size: 1em; }
+            .control-btn, .control-select { font-size: 0.65em; } /* This will scale based on new body font-size */
+             #placar table { font-size: 1em; }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 12px; /* 8px * 1.5 */
+                padding-top: 150px;  /* 100px * 1.5 */
+            }
+            .container {
+                padding: 22px 15px; /* (15px*1.5 rounded) (10px*1.5) */
+            }
+             .sticky-header nav ul li a {
+                font-size: 1em; 
+                padding: 8px 12px; /* (5px*1.5 rounded) (8px*1.5) */
+            }
+            h1 { font-size: 1.8em; }
+            h2 { font-size: 1.4em; }
+            .controls-panel { padding: 15px; } /* 10px * 1.5 */
+            .control-btn, .control-select { 
+                margin: 5px; /* 3px * 1.5 (rounded) */
+                padding: 9px 12px; /* (6px*1.5) (8px*1.5) */
+                font-size: 0.6em; /* This will scale based on new body font-size */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="sticky-header">
+        <nav>
+            <ul>
+                <li><a href="#pagina-inicial" class="nav-link active">PÁGINA INICIAL</a></li>
+                <li><a href="#cartoes-missao" class="nav-link">CARTÕES DE MISSÃO</a></li>
+                <li><a href="#lojinha" class="nav-link">LOJINHA</a></li>
+                <li><a href="#placar" class="nav-link">PLACAR</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section id="pagina-inicial" class="content-section active">
+        <div class="container">
+            <h1><span class="role-icon">🎮</span> Missão Arcade: Conquiste Pontos e Crie Jogos Incríveis! <span class="role-icon">🏆</span></h1>
+
+            <p>Preparem-se, futuros mestres dos games! Nesta jornada, vocês vão criar seus próprios jogos no Microsoft MakeCode Arcade, aprender muito e, o melhor de tudo, ganhar <strong>PONTOS</strong> incríveis que podem ser trocados por vantagens super legais na nossa <strong>Lojinha de Tesouros</strong>! Cada tarefa cumprida é um passo mais perto de se tornar uma lenda do desenvolvimento de jogos!</p>
+
+            <hr>
+
+            <h2><span class="role-icon">🧑‍🤝‍🧑</span> As Super Equipes (Funções):</h2>
+            <p>Cada membro da equipe terá um papel especial. Trabalhem juntos para o sucesso!</p>
+            <ul>
+                <li><strong class="role-designer role-title"><span class="role-icon">🎨</span> DESIGNER:</strong> O artista da equipe! Cria o visual, os personagens e a identidade do jogo.</li>
+                <li><strong class="role-manager role-title"><span class="role-icon">📋</span> GERENTE:</strong> O cérebro da organização! Garante que tudo esteja nos trilhos, documentado e compartilhado.</li>
+                <li><strong class="role-presenter role-title"><span class="role-icon">🎤</span> APRESENTADOR:</strong> A voz da equipe! Prepara e realiza apresentações impactantes sobre o jogo.</li>
+                <li><strong class="role-programmer role-title"><span class="role-icon">💻</span> PROGRAMADOR:</strong> O gênio do código! Dá vida ao jogo, programando as mecânicas e funcionalidades.</li>
+                <li><strong class="role-all role-title"><span class="role-icon">🤝</span> TODOS:</strong> Algumas missões exigem o poder de todos juntos!</li>
+            </ul>
+
+            <hr>
+
+            <h2><span class="role-icon">🚀</span> Jornada de Missões e Pontuações:</h2>
+
+            <h3>FASE 1: O Pontapé Inicial – A Ideia Ganha Forma!</h3>
+            <p><em>(Foco: Planejamento, identidade visual e organização inicial)</em></p>
+            <ul>
+                <li><strong class="role-designer role-title">DESIGNER:</strong>
+                    <ul>
+                        <li>Nome com Estilo: Criar um nome original e empolgante para a equipe. <span class="points">(25 Pontos)</span></li>
+                        <li>Título do Jogo: Definir o nome oficial e criativo do jogo. <span class="points">(25 Pontos)</span></li>
+                        <li>Primeira Impressão: Criar uma logo marcante para o jogo (pode usar IA ou outra ferramenta tecnológica). <span class="points">(75 Pontos)</span></li>
+                    </ul>
+                </li>
+                <li><strong class="role-manager role-title">GERENTE:</strong>
+                    <ul>
+                        <li>Base de Operações: Criar a pasta da equipe no Drive e os arquivos principais: "Diário de Bordo do Jogo" (Word) e "Apresentação da Equipe" (PowerPoint). Nomear com nome da equipe e turma (Ex: "Dragões Digitais - 6A"). <span class="points">(30 Pontos)</span></li>
+                        <li>Todos Conectados: Compartilhar a pasta e os arquivos com todos os membros da sua equipe e com o professor. <span class="points">(20 Pontos)</span></li>
+                        <li>Registro de Equipe: Documentar os papéis e responsabilidades iniciais de cada membro da equipe no "Diário de Bordo". <span class="points">(25 Pontos)</span></li> <li>Cronograma Inicial: Esboçar um cronograma básico para a Fase 1 no "Diário de Bordo". <span class="points">(25 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-presenter role-title">APRESENTADOR:</strong>
+                    <ul>
+                        <li>Cartão de Visitas: No primeiro slide da "Apresentação da Equipe" e na primeira página do "Diário de Bordo", listar os integrantes da sua equipe em ordem alfabética. <span class="points">(20 Pontos)</span></li>
+                        <li>Elevator Pitch da Equipe: Preparar uma breve apresentação (1 minuto) da equipe e seus objetivos. <span class="points">(30 Pontos)</span></li> <li>Pesquisa de Referências: Buscar e apresentar 2 jogos similares para inspirar a equipe. <span class="points">(50 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-programmer role-title">PROGRAMADOR:</strong>
+                    <ul>
+                        <li>Explorando o Universo Arcade: Completar os tutoriais iniciais do MakeCode Arcade indicados pelo professor. <span class="points">(50 Pontos)</span></li>
+                        <li>Configuração de Ambiente: Certificar-se que todos da equipe têm acesso e sabem o básico do MakeCode Arcade. <span class="points">(25 Pontos)</span></li> <li>Primeiro Teste: Criar um sprite simples e fazê-lo mover com os botões direcionais. <span class="points">(50 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-all role-title">TODOS:</strong>
+                    <ul>
+                        <li>Brainstorm de Ideias: Discutir e definir o conceito básico do jogo (tema, tipo de jogo, personagem principal). Registrar as ideias no "Diário de Bordo". <span class="points">(50 Pontos)</span></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>FASE 2: Mãos à Obra – Construindo o Jogo!</h3>
+            <p><em>(Foco: Desenvolvimento inicial, documentação e design)</em></p>
+            <ul>
+                <li><strong class="role-designer role-title">DESIGNER:</strong>
+                    <ul>
+                        <li>Rascunhos da Imaginação: Desenvolver artes conceituais (desenhos) dos personagens principais e de um cenário/nível do jogo. <span class="points">(100 Pontos)</span></li>
+                        <li>Manual para Aventureiros: Criar um rascunho do manual de instruções do jogo, explicando como jogar (objetivo, controles básicos). <span class="points">(75 Pontos)</span></li>
+                    </ul>
+                </li>
+                <li><strong class="role-manager role-title">GERENTE:</strong>
+                    <ul>
+                        <li>Diário em Dia: Manter o "Diário de Bordo" atualizado com as decisões importantes da equipe, progresso das tarefas e próximos passos (pelo menos um registro por semana de trabalho). <span class="points">(50 Pontos por atualização semanal consistente)</span></li>
+                        <li>Controle de Versões: Definir um sistema simples para nomear e salvar versões do jogo. <span class="points">(30 Pontos)</span></li> <li>Lista de Recursos: Manter uma lista dos assets (imagens, sons) criados/utilizados no "Diário de Bordo". <span class="points">(40 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-presenter role-title">APRESENTADOR:</strong>
+                    <ul>
+                        <li>Storytelling Inicial: Escrever um parágrafo sobre a história ou o tema do jogo para a apresentação. <span class="points">(50 Pontos)</span></li> <li>Roteiro do Teaser: Planejar o que será mostrado no primeiro teaser do jogo. <span class="points">(50 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-programmer role-title">PROGRAMADOR:</strong>
+                    <ul>
+                        <li>Protótipo Jogável (Versão Alfa 1.0): Desenvolver a primeira versão jogável do jogo, contendo:
+                            <ul>
+                                <li>Movimentação básica do personagem principal. <span class="points">(75 Pontos)</span></li>
+                                <li>Um objetivo simples ou interação principal (Ex: coletar um item, chegar a um local). <span class="points">(75 Pontos)</span></li>
+                                <li>Nomear o arquivo do jogo como `[NomeDoJogo]_Alfa_1.0`. (Obrigatório para os pontos anteriores)</li>
+                            </ul>
+                        </li>
+                        <li>Mecânica Adicional Simples: Implementar uma mecânica secundária básica (ex: pulo simples, disparo básico). <span class="points">(75 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-all role-title">TODOS:</strong>
+                    <ul>
+                        <li>DNA do Jogo (Ficha Técnica): Preencher a Ficha Técnica completa do seu jogo no "Diário de Bordo", detalhando cada seção (conforme modelo fornecido). <span class="points">(150 Pontos por ficha completa e bem detalhada)</span></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>FASE 3: Refinando a Criação – Polimento e Novas Descobertas!</h3>
+            <p><em>(Foco: Adicionar funcionalidades, testar e melhorar)</em></p>
+             <ul>
+                <li><strong class="role-designer role-title">DESIGNER:</strong>
+                    <ul>
+                        <li>Paleta de Cores e Estilo: Definir e aplicar um estilo visual consistente para os elementos do jogo (sprites, tiles, interface). <span class="points">(75 Pontos)</span></li>
+                        <li>Animação que Encanta: Criar animações básicas para o personagem principal (Ex: parado, andando, pulando). <span class="points">(100 Pontos)</span></li>
+                        <li>Design de Interface (UI): Desenhar rascunhos para a tela inicial e de game over. <span class="points">(50 Pontos)</span></li> <li>Ícones do Jogo: Criar pequenos ícones para itens ou ações no jogo. <span class="points">(50 Pontos)</span></li> </ul>
+                </li>
+                 <li><strong class="role-manager role-title">GERENTE:</strong>
+                    <ul>
+                        <li>Checklist de Funcionalidades: Criar e manter um checklist das funcionalidades planejadas e seu status. <span class="points">(40 Pontos)</span></li> <li>Feedback Organizado: Coletar e organizar o feedback dos testes (internos e de outras equipes). <span class="points">(60 Pontos)</span></li> <li>Relatório de Progresso: Preparar um breve relatório de progresso da Fase 3 para o professor. <span class="points">(50 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-presenter role-title">APRESENTADOR:</strong>
+                    <ul>
+                        <li>Primeiro Teaser: Preparar e gravar um vídeo curto (30-60 segundos) mostrando o estado atual do jogo e o que ele tem de legal (um mini-trailer). <span class="points">(100 Pontos)</span></li>
+                        <li>Coleta de Depoimentos: Gravar pequenos áudios ou vídeos dos membros da equipe falando sobre o jogo. <span class="points">(50 Pontos)</span></li> <li>Divulgação Interna: Compartilhar o teaser com outras equipes e pedir feedback. <span class="points">(50 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-programmer role-title">PROGRAMADOR:</strong>
+                    <ul>
+                        <li>Desafio e Recompensa: Implementar um sistema de pontuação funcional no jogo. <span class="points">(100 Pontos)</span></li>
+                        <li>Sons da Aventura: Adicionar pelo menos 3 efeitos sonoros importantes (Ex: pulo, coleta de item, dano) e 1 música de fundo ao jogo. <span class="points">(100 Pontos)</span></li>
+                        <li>Portal de Entrada e Saída: Desenvolver uma tela inicial (com o nome do jogo e botão "Iniciar") e uma tela de "Fim de Jogo" (Game Over) ou "Vitória". <span class="points">(100 Pontos)</span></li>
+                        <li>Novos Horizontes (Opcional Avançado): Criar um segundo nível ou diferentes níveis de dificuldade (se aplicável ao jogo). <span class="points">(150 Pontos por nível/dificuldade extra bem implementado)</span></li>
+                    </ul>
+                </li>
+                <li><strong class="role-all role-title">TODOS:</strong>
+                    <ul>
+                        <li>Caça-Bugs Profissional: Realizar testes de jogabilidade focados em encontrar problemas (bugs). Cada bug encontrado, documentado no "Diário de Bordo" (com descrição e como reproduzir) e depois corrigido pelo programador vale: <span class="points">(25 Pontos por bug corrigido. Máximo de 5 bugs premiados para esta missão, incentivando qualidade desde o início)</span>.</li>
+                        <li>Feedback Construtivo: Jogar os protótipos de outras duas equipes e fornecer feedback escrito (seguindo um modelo simples fornecido pelo professor). <span class="points">(75 Pontos por feedback de qualidade dado a cada equipe)</span></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h3>FASE 4: A Grande Estreia – Mostre seu Brilho!</h3>
+            <p><em>(Foco: Finalização, apresentação e celebração)</em></p>
+            <ul>
+                <li><strong class="role-designer role-title">DESIGNER:</strong>
+                    <ul>
+                        <li>Manual Impecável: Finalizar o manual de instruções do jogo, com design atraente e todas as informações necessárias para jogar. <span class="points">(75 Pontos)</span></li>
+                        <li>Propaganda é a Alma do Jogo: Criar um pôster digital ou flyer de divulgação do seu jogo. <span class="points">(50 Pontos)</span></li>
+                        <li>Kit de Mídia: Preparar um pequeno pacote com a logo, screenshots e o pôster para divulgação. <span class="points">(50 Pontos)</span></li> <li>Design da Apresentação: Ajudar o Apresentador com o visual dos slides da apresentação final. <span class="points">(50 Pontos)</span></li> <li>Polimento Visual Final: Última revisão de todos os assets visuais do jogo. <span class="points">(75 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-manager role-title">GERENTE:</strong>
+                    <ul>
+                        <li>Documentação Final: Organizar todos os arquivos do projeto (jogo final, diário de bordo completo, apresentação final, artes) na pasta da equipe e garantir que tudo esteja compartilhado corretamente. <span class="points">(50 Pontos)</span></li>
+                        <li>Backup Completo: Realizar um backup final de todo o projeto em local seguro. <span class="points">(25 Pontos)</span></li> <li>Checklist de Entrega: Verificar se todos os itens solicitados pelo professor foram entregues. <span class="points">(25 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-presenter role-title">APRESENTADOR:</strong>
+                    <ul>
+                        <li>Showtime! Preparar a Apresentação Final: Criar uma apresentação completa do jogo (slides) para a turma, incluindo: história do desenvolvimento, ficha técnica resumida, demonstração ao vivo e os pontos fortes do jogo. <span class="points">(150 Pontos)</span></li>
+                        <li>Trailer Oficial: Produzir um vídeo de apresentação final do jogo (trailer de 1-2 minutos mostrando as melhores partes). <span class="points">(200 Pontos)</span></li>
+                        <li>Roteiro da Demonstração: Preparar um roteiro para a demonstração ao vivo do jogo durante a apresentação. <span class="points">(50 Pontos)</span></li> <li>Ensaio da Apresentação: Realizar pelo menos um ensaio completo da apresentação final. <span class="points">(50 Pontos)</span></li> <li>Material de Apoio: Preparar notas ou cartões de apoio para a apresentação. <span class="points">(25 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-programmer role-title">PROGRAMADOR:</strong>
+                    <ul>
+                        <li>Versão de Ouro (Final 1.0): Finalizar o jogo, corrigindo bugs importantes e garantindo que todas as funcionalidades planejadas (e pontuadas) estejam funcionando. Nomear o arquivo como `[NomeDoJogo]_Final_1.0`. <span class="points">(200 Pontos)</span></li>
+                        <li>Demonstração Técnica Completa: Gravar a tela realizando uma demonstração completa do jogo finalizado, explicando as mecânicas e funcionalidades. <span class="points">(100 Pontos)</span></li>
+                        <li>Código Comentado: Adicionar comentários no código para explicar partes complexas ou importantes. <span class="points">(50 Pontos)</span></li> <li>Otimização Final: Revisar o código para pequenas otimizações de performance (se aplicável). <span class="points">(50 Pontos)</span></li> </ul>
+                </li>
+                <li><strong class="role-all role-title">TODOS:</strong>
+                    <ul>
+                        <li>Apresentação em Equipe: Realizar a apresentação do jogo para a turma ou em um evento da escola. <span class="points">(300 Pontos pela apresentação + 50 Pontos bônus se todos da equipe participarem ativamente da fala)</span></li>
+                        <li>Legado do Jogo: Escrever uma pequena reflexão no "Diário de Bordo" sobre o que aprenderam, os maiores desafios que superaram e os melhores momentos do projeto. <span class="points">(50 Pontos)</span></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <hr>
+
+            <h2><span class="role-icon">🏆</span> Missões de Cooperação e Excelência:</h2>
+            <p><em>(Valem durante todo o projeto)</em></p>
+            <ul>
+                <li><strong class="role-all">Espírito de Equipe Nota 10:</strong> Participar ativamente das discussões, dar ideias construtivas e ajudar os colegas da <em>própria equipe</em> a superar desafios. <span class="points">(25 Pontos por semana, avaliado pelo Gerente e Professor)</span></li>
+                <li><strong class="role-all">Mão Amiga InterEquipes:</strong> Ajudar membros de <em>outras equipes</em> com dificuldades (comprovar com um agradecimento da equipe ajudada). <span class="points">(50 Pontos por ajuda significativa)</span></li>
+                <li><strong class="role-all">Ideia Brilhante e Implementada:</strong> Apresentar uma ideia criativa e inovadora para o <em>próprio jogo</em> que seja efetivamente implementada. <span class="points">(75 Pontos por ideia implementada)</span></li>
+                <li><strong class="role-all">Pontualidade Show:</strong> Cumprir os prazos principais estabelecidos para as entregas de cada fase. <span class="points">(50 Pontos por fase principal entregue no prazo)</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="cartoes-missao" class="content-section">
+        <div class="container">
+            <h1><span class="role-icon">🃏</span> Cartões de Missão: Missão Arcade <span class="role-icon">🏆</span></h1>
+
+            <div class="controls-panel">
+                <h4>Controles de Visualização</h4>
+                <div class="control-group">
+                    <label for="phase-selector">Selecionar Fase:</label>
+                    <select id="phase-selector" class="control-select">
+                        <option value="all">Todas as Fases</option>
+                        <option value="fase1">FASE 1</option>
+                        <option value="fase2">FASE 2</option>
+                        <option value="fase3">FASE 3</option>
+                        <option value="fase4">FASE 4</option>
+                        <option value="cooperacao">Missões de Cooperação</option>
+                    </select>
+                </div>
+
+                <div>
+                    <p>Mostrar/Esconder por Função:</p>
+                    <button class="role-filter-btn control-btn" data-role="designer">Mostrar Designer 🎨</button>
+                    <button class="role-filter-btn control-btn" data-role="gerente">Mostrar Gerente 📋</button>
+                    <button class="role-filter-btn control-btn" data-role="apresentador">Mostrar Apresentador 🎤</button>
+                    <button class="role-filter-btn control-btn" data-role="programador">Mostrar Programador 💻</button>
+                    </div>
+            </div>
+
+            <div class="phase-content-wrapper" data-phase="fase1">
+                <h2><span class="role-icon">1️⃣</span> FASE 1: O Pontapé Inicial – A Ideia Ganha Forma!</h2>
+                <div class="mission-card" data-role="designer">
+                    <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Nome com Estilo: Criar um nome original e empolgante para a equipe.</p>
+                    <p class="points">(25 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="designer">
+                    <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Título do Jogo: Definir o nome oficial e criativo do jogo.</p>
+                    <p class="points">(25 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="designer">
+                    <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Primeira Impressão: Criar uma logo marcante para o jogo (pode usar IA ou outra ferramenta tecnológica).</p>
+                    <p class="points">(75 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="gerente">
+                    <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Base de Operações: Criar a pasta da equipe no Drive e os arquivos principais: "Diário de Bordo do Jogo" (Word) e "Apresentação da Equipe" (PowerPoint). Nomear com nome da equipe e turma (Ex: "Dragões Digitais - 6A").</p>
+                    <p class="points">(30 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="gerente">
+                    <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Todos Conectados: Compartilhar a pasta e os arquivos com todos os membros da sua equipe e com o professor.</p>
+                    <p class="points">(20 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="gerente"> <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Registro de Equipe: Documentar os papéis e responsabilidades iniciais de cada membro da equipe no "Diário de Bordo".</p>
+                    <p class="points">(25 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="gerente"> <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Cronograma Inicial: Esboçar um cronograma básico para a Fase 1 no "Diário de Bordo".</p>
+                    <p class="points">(25 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="apresentador">
+                    <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Cartão de Visitas: No primeiro slide da "Apresentação da Equipe" e na primeira página do "Diário de Bordo", listar os integrantes da sua equipe em ordem alfabética.</p>
+                    <p class="points">(20 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="apresentador"> <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Elevator Pitch da Equipe: Preparar uma breve apresentação (1 minuto) da equipe e seus objetivos.</p>
+                    <p class="points">(30 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="apresentador"> <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Pesquisa de Referências: Buscar e apresentar 2 jogos similares para inspirar a equipe.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador">
+                    <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Explorando o Universo Arcade: Completar os tutoriais iniciais do MakeCode Arcade indicados pelo professor.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador"> <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Configuração de Ambiente: Certificar-se que todos da equipe têm acesso e sabem o básico do MakeCode Arcade.</p>
+                    <p class="points">(25 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador"> <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Primeiro Teste: Criar um sprite simples e fazê-lo mover com os botões direcionais.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> Brainstorm de Ideias: Discutir e definir o conceito básico do jogo (tema, tipo de jogo, personagem principal). Registrar as ideias no "Diário de Bordo".</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <hr>
+            </div>
+
+            <div class="phase-content-wrapper" data-phase="fase2">
+                <h2><span class="role-icon">2️⃣</span> FASE 2: Mãos à Obra – Construindo o Jogo!</h2>
+                <div class="mission-card" data-role="designer">
+                    <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Rascunhos da Imaginação: Desenvolver artes conceituais (desenhos) dos personagens principais e de um cenário/nível do jogo.</p>
+                    <p class="points">(100 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="designer">
+                    <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Manual para Aventureiros: Criar um rascunho do manual de instruções do jogo, explicando como jogar (objetivo, controles básicos).</p>
+                    <p class="points">(75 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="gerente">
+                    <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Diário em Dia: Manter o "Diário de Bordo" atualizado com as decisões importantes da equipe, progresso das tarefas e próximos passos (pelo menos um registro por semana de trabalho).</p>
+                    <p class="points">(50 Pontos por atualização semanal consistente)</p>
+                </div>
+                 <div class="mission-card" data-role="gerente"> <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Controle de Versões: Definir um sistema simples para nomear e salvar versões do jogo.</p>
+                    <p class="points">(30 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="gerente"> <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Lista de Recursos: Manter uma lista dos assets (imagens, sons) criados/utilizados no "Diário de Bordo".</p>
+                    <p class="points">(40 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="apresentador"> <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Storytelling Inicial: Escrever um parágrafo sobre a história ou o tema do jogo para a apresentação.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="apresentador"> <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Roteiro do Teaser: Planejar o que será mostrado no primeiro teaser do jogo.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador">
+                    <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Protótipo Jogável (Alfa 1.0) - Movimentação básica do personagem principal. (Nome `[NomeDoJogo]_Alfa_1.0`)</p>
+                    <p class="points">(75 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador">
+                    <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Protótipo Jogável (Alfa 1.0) - Um objetivo simples ou interação principal. (Nome `[NomeDoJogo]_Alfa_1.0`)</p>
+                    <p class="points">(75 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="programador"> <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Mecânica Adicional Simples: Implementar uma mecânica secundária básica (ex: pulo simples, disparo básico).</p>
+                    <p class="points">(75 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> DNA do Jogo (Ficha Técnica): Preencher a Ficha Técnica completa do seu jogo no "Diário de Bordo", detalhando cada seção (conforme modelo fornecido).</p>
+                    <p class="points">(150 Pontos por ficha completa e bem detalhada)</p>
+                </div>
+                <hr>
+            </div>
+
+            <div class="phase-content-wrapper" data-phase="fase3">
+                <h2><span class="role-icon">3️⃣</span> FASE 3: Refinando a Criação – Polimento e Novas Descobertas!</h2>
+                <div class="mission-card" data-role="designer">
+                    <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Paleta de Cores e Estilo: Definir e aplicar um estilo visual consistente para os elementos do jogo (sprites, tiles, interface).</p>
+                    <p class="points">(75 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="designer">
+                    <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Animação que Encanta: Criar animações básicas para o personagem principal (Ex: parado, andando, pulando).</p>
+                    <p class="points">(100 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="designer"> <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Design de Interface (UI): Desenhar rascunhos para a tela inicial e de game over.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="designer"> <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Ícones do Jogo: Criar pequenos ícones para itens ou ações no jogo.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="gerente"> <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Checklist de Funcionalidades: Criar e manter um checklist das funcionalidades planejadas e seu status.</p>
+                    <p class="points">(40 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="gerente"> <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Feedback Organizado: Coletar e organizar o feedback dos testes (internos e de outras equipes).</p>
+                    <p class="points">(60 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="gerente"> <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Relatório de Progresso: Preparar um breve relatório de progresso da Fase 3 para o professor.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="apresentador">
+                    <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Primeiro Teaser: Preparar e gravar um vídeo curto (30-60 segundos) mostrando o estado atual do jogo e o que ele tem de legal (um mini-trailer).</p>
+                    <p class="points">(100 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="apresentador"> <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Coleta de Depoimentos: Gravar pequenos áudios ou vídeos dos membros da equipe falando sobre o jogo.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="apresentador"> <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Divulgação Interna: Compartilhar o teaser com outras equipes e pedir feedback.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador">
+                    <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Desafio e Recompensa: Implementar um sistema de pontuação funcional no jogo.</p>
+                    <p class="points">(100 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador">
+                    <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Sons da Aventura: Adicionar pelo menos 3 efeitos sonoros importantes e 1 música de fundo.</p>
+                    <p class="points">(100 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador">
+                    <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Portal de Entrada e Saída: Desenvolver tela inicial e tela de "Fim de Jogo" ou "Vitória".</p>
+                    <p class="points">(100 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador">
+                    <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Novos Horizontes (Opcional Avançado): Criar um segundo nível ou diferentes níveis de dificuldade.</p>
+                    <p class="points">(150 Pontos por nível/dificuldade extra)</p>
+                </div>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> Caça-Bugs Profissional: Testar, documentar e corrigir bugs.</p>
+                    <p class="points">(25 Pontos por bug corrigido. Máx. 5)</p>
+                </div>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> Feedback Construtivo: Jogar protótipos de outras duas equipes e fornecer feedback escrito.</p>
+                    <p class="points">(75 Pontos por feedback de qualidade)</p>
+                </div>
+                <hr>
+            </div>
+
+            <div class="phase-content-wrapper" data-phase="fase4">
+                <h2><span class="role-icon">4️⃣</span> FASE 4: A Grande Estreia – Mostre seu Brilho!</h2>
+                <div class="mission-card" data-role="designer">
+                    <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Manual Impecável: Finalizar o manual de instruções do jogo.</p>
+                    <p class="points">(75 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="designer">
+                    <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Propaganda é a Alma do Jogo: Criar um pôster digital ou flyer de divulgação.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="designer"> <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Kit de Mídia: Preparar um pequeno pacote com a logo, screenshots e o pôster para divulgação.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="designer"> <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Design da Apresentação: Ajudar o Apresentador com o visual dos slides da apresentação final.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="designer"> <h3><span class="role-icon">🎨</span> Designer</h3>
+                    <p><strong>Missão:</strong> Polimento Visual Final: Última revisão de todos os assets visuais do jogo.</p>
+                    <p class="points">(75 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="gerente">
+                    <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Documentação Final: Organizar todos os arquivos do projeto e garantir compartilhamento.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="gerente"> <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Backup Completo: Realizar um backup final de todo o projeto em local seguro.</p>
+                    <p class="points">(25 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="gerente"> <h3><span class="role-icon">📋</span> Gerente</h3>
+                    <p><strong>Missão:</strong> Checklist de Entrega: Verificar se todos os itens solicitados pelo professor foram entregues.</p>
+                    <p class="points">(25 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="apresentador">
+                    <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Showtime! Preparar a Apresentação Final completa do jogo (slides).</p>
+                    <p class="points">(150 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="apresentador">
+                    <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Trailer Oficial: Produzir um vídeo de apresentação final do jogo (1-2 minutos).</p>
+                    <p class="points">(200 Pontos)</p>
+                </div>
+                 <div class="mission-card" data-role="apresentador"> <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Roteiro da Demonstração: Preparar um roteiro para a demonstração ao vivo do jogo.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="apresentador"> <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Ensaio da Apresentação: Realizar pelo menos um ensaio completo da apresentação final.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="apresentador"> <h3><span class="role-icon">🎤</span> Apresentador</h3>
+                    <p><strong>Missão:</strong> Material de Apoio: Preparar notas ou cartões de apoio para a apresentação.</p>
+                    <p class="points">(25 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador">
+                    <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Versão de Ouro (Final 1.0): Finalizar o jogo, corrigindo bugs e garantindo funcionalidades. Nome `[NomeDoJogo]_Final_1.0`.</p>
+                    <p class="points">(200 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador">
+                    <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Demonstração Técnica Completa: Gravar tela com demonstração completa do jogo finalizado.</p>
+                    <p class="points">(100 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador"> <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Código Comentado: Adicionar comentários no código para explicar partes complexas.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="programador"> <h3><span class="role-icon">💻</span> Programador</h3>
+                    <p><strong>Missão:</strong> Otimização Final: Revisar o código para pequenas otimizações de performance.</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> Apresentação em Equipe: Realizar a apresentação do jogo para a turma ou evento.</p>
+                    <p class="points">(300 Pts + 50 Pts bônus por participação ativa de todos)</p>
+                </div>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> Legado do Jogo: Escrever reflexão no "Diário de Bordo" (aprendizados, desafios, melhores momentos).</p>
+                    <p class="points">(50 Pontos)</p>
+                </div>
+                <hr>
+            </div>
+
+            <div class="phase-content-wrapper" data-phase="cooperacao">
+                <h2><span class="role-icon">🏆</span> Missões de Cooperação e Excelência (Valem durante todo o projeto)</h2>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> Espírito de Equipe Nota 10: Participar ativamente, dar ideias, ajudar colegas da *própria equipe*.</p>
+                    <p class="points">(25 Pontos por semana, avaliado pelo Gerente e Professor)</p>
+                </div>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> Mão Amiga InterEquipes: Ajudar membros de *outras equipes* (comprovar com agradecimento).</p>
+                    <p class="points">(50 Pontos por ajuda significativa)</p>
+                </div>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> Ideia Brilhante e Implementada: Apresentar ideia criativa e inovadora para o *próprio jogo* que seja implementada.</p>
+                    <p class="points">(75 Pontos por ideia implementada)</p>
+                </div>
+                <div class="mission-card" data-role="todos">
+                    <h3><span class="role-icon">🤝</span> Todos</h3>
+                    <p><strong>Missão:</strong> Pontualidade Show: Cumprir os prazos principais estabelecidos para as entregas de cada fase.</p>
+                    <p class="points">(50 Pontos por fase principal entregue no prazo)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="lojinha" class="content-section">
+        <div class="container">
+            <h1><span class="role-icon">🛍️</span> Lojinha de Tesouros do Arcade:</h1>
+            <p>Troque seus Pontos conquistados por vantagens incríveis!</p>
+
+            <h4>Recursos para Turbinar seu Jogo:</h4>
+            <ul>
+                <li class="shop-item">
+                    <strong><span class="role-icon">💡</span> Consultoria Express do Professor</strong>
+                    <span class="shop-points">(150 PONTOS)</span>
+                    <p>15 minutos de ajuda focada do professor em um desafio específico do seu jogo.</p>
+                </li>
+                <li class="shop-item">
+                    <strong><span class="role-icon">🎨</span> Kit de Inspiração Visual</strong>
+                    <span class="shop-points">(75 PONTOS)</span>
+                    <p>Acesso a uma pasta especial com sprites, tiles e referências visuais extras para inspirar o design do seu jogo.</p>
+                </li>
+                <li class="shop-item">
+                    <strong><span class="role-icon">🎵</span> Sugestão Sonora do DJ Professor</strong>
+                    <span class="shop-points">(50 PONTOS)</span>
+                    <p>O professor indica 3 músicas ou tipos de efeitos sonoros que combinam perfeitamente com a atmosfera do seu jogo.</p>
+                </li>
+                <li class="shop-item">
+                    <strong><span class="role-icon">🐞</span> Inspeção Anti-Bug Avançada</strong>
+                    <span class="shop-points">(200 PONTOS)</span>
+                    <p>O professor dedica um tempo extra para testar seu jogo profundamente e ajudar a identificar aqueles bugs mais teimosos e escondidos.</p>
+                </li>
+                <li class="shop-item">
+                    <strong><span class="role-icon">✨</span> "Recurso Mágico" Surpresa</strong>
+                    <span class="shop-points">(250 PONTOS)</span>
+                    <p>Ajuda especializada do professor para implementar <strong>UMA</strong> pequena funcionalidade extra que a equipe deseje muito (Ex: um tipo de inimigo simples com um comportamento novo, um power-up básico diferente).</p>
+                </li>
+            </ul>
+
+            <h4>Vantagens para a Equipe e Eventos:</h4>
+            <ul>
+                <li class="shop-item">
+                    <strong><span class="role-icon">🤝</span> Convite de Colaborador Ninja</strong>
+                    <span class="shop-points">(300 PONTOS)</span>
+                    <p>Sua equipe pode "convocar" <strong>UM</strong> colega de outra equipe para ajudar em uma tarefa específica do seu jogo por um período determinado (com permissão do professor e da outra equipe).</p>
+                </li>
+                <li class="shop-item">
+                    <strong><span class="role-icon">🏅</span> Desafio Amistoso InterEquipes</strong>
+                    <span class="shop-points">(100 PONTOS)</span>
+                    <p>Sua equipe pode usar pontos para lançar um desafio criativo (de design, programação ou tema específico) para outra equipe. A equipe que aceitar e cumprir o desafio (se houver acordo e regras claras) também ganha pontos bônus!</p>
+                </li>
+                <li class="shop-item">
+                    <strong><span class="role-icon">🗳️</span> Voto Dourado de Prestígio</strong>
+                    <span class="shop-points">(150 PONTOS)</span>
+                    <p>No dia da apresentação final dos jogos, sua equipe pode usar esses pontos para dar um "voto de qualidade" com peso extra para <strong>UM</strong> jogo de outra equipe que vocês admiraram muito.</p>
+                </li>
+                <li class="shop-item">
+                    <strong><span class="role-icon">🎉</span> Bilhete da Sorte para o Futuro</strong>
+                    <span class="shop-points">(50 PONTOS por bilhete)</span>
+                    <p>Compre um "bilhete" com pontos. No final do projeto, será sorteado um tema para um mini-projeto extra divertido ou para inspirar a próxima rodada de projetos.</p>
+                </li>
+            </ul>
+
+            <h4>Regras da Lojinha:</h4>
+            <ul>
+                <li>Os itens da lojinha são "comprados" pela equipe, usando os pontos totais acumulados.</li>
+                <li>Conversem com o professor para "resgatar" um item da lojinha.</li>
+                <li>Atenção: Alguns itens podem ser limitados ou ter condições especiais!</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="placar" class="content-section">
+        <div class="container">
+            <h1><span class="role-icon">🏆</span> PLACAR DAS EQUIPES <span class="role-icon">🏆</span></h1>
+            <p>Acompanhe a pontuação das equipes ao longo da Missão Arcade!</p>
+
+            <div class="controls-panel">
+                <h4>Filtrar Placar</h4>
+                <div class="control-group">
+                    <label for="turma-selector">Selecionar Turma:</label>
+                    <select id="turma-selector" class="control-select">
+                        <option value="all">Todas as Turmas</option>
+                        <option value="A">Turma A</option>
+                        <option value="B">Turma B</option>
+                    </select>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Posição</th>
+                        <th>Nome da Equipe</th>
+                        <th>Turma</th>
+                        <th>Pontuação Total</th>
+                    </tr>
+                </thead>
+                <tbody id="placar-tbody">
+                    <tr data-turma="A">
+                        <td>1</td>
+                        <td class="team-name">Equipe Alpha</td>
+                        <td class="team-turma">A</td>
+                        <td class="team-score">0</td>
+                    </tr>
+                    <tr data-turma="B">
+                        <td>2</td>
+                        <td class="team-name">Equipe Beta</td>
+                        <td class="team-turma">B</td>
+                        <td class="team-score">0</td>
+                    </tr>
+                    <tr data-turma="A">
+                        <td>3</td>
+                        <td class="team-name">Equipe Gama</td>
+                        <td class="team-turma">A</td>
+                        <td class="team-score">0</td>
+                    </tr>
+                    <tr data-turma="B">
+                        <td>4</td>
+                        <td class="team-name">Equipe Delta</td>
+                        <td class="team-turma">B</td>
+                        <td class="team-score">0</td>
+                    </tr>
+                    <tr data-turma="A">
+                        <td>5</td>
+                        <td class="team-name">Equipe Epsilon</td>
+                        <td class="team-turma">A</td>
+                        <td class="team-score">0</td>
+                    </tr>
+                    <tr data-turma="B">
+                        <td>6</td>
+                        <td class="team-name">Equipe Zeta</td>
+                        <td class="team-turma">B</td>
+                        <td class="team-score">0</td>
+                    </tr>
+                    <tr data-turma="A">
+                        <td>7</td>
+                        <td class="team-name">Equipe Eta</td>
+                        <td class="team-turma">A</td>
+                        <td class="team-score">0</td>
+                    </tr>
+                    <tr data-turma="B">
+                        <td>8</td>
+                        <td class="team-name">Equipe Theta</td>
+                        <td class="team-turma">B</td>
+                        <td class="team-score">0</td>
+                    </tr>
+                    <tr data-turma="B">
+                        <td>9</td>
+                        <td class="team-name">Equipe Romeu</td>
+                        <td class="team-turma">B</td>
+                        <td class="team-score">230</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Navigation Handler
+            const navLinks = document.querySelectorAll('.nav-link');
+            const contentSections = document.querySelectorAll('.content-section');
+
+            function setActiveSection(targetId) {
+                contentSections.forEach(section => {
+                    if (section.id === targetId) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === `#${targetId}`) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+                window.scrollTo(0, 0); // Scroll to top when changing sections
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    setActiveSection(targetId);
+                    try {
+                        history.pushState(null, null, `#${targetId}`);
+                    } catch (e) {
+                        window.location.hash = `#${targetId}`;
+                    }
+                });
+            });
+
+            function handleInitialLoad() {
+                if (window.location.hash) {
+                    const initialTargetId = window.location.hash.substring(1);
+                    const sectionExists = Array.from(contentSections).some(s => s.id === initialTargetId);
+                    if (sectionExists) {
+                        setActiveSection(initialTargetId);
+                    } else {
+                        setActiveSection('pagina-inicial'); 
+                    }
+                } else {
+                    setActiveSection('pagina-inicial'); 
+                }
+            }
+            handleInitialLoad(); 
+            
+            window.addEventListener('popstate', () => {
+                handleInitialLoad(); 
+            });
+
+
+            // Mission Cards Filter
+            const phaseSelector = document.getElementById('phase-selector');
+            const allPhaseContainers = document.querySelectorAll('#cartoes-missao .phase-content-wrapper');
+            const roleFilterBtns = document.querySelectorAll('#cartoes-missao .role-filter-btn');
+
+            function toggleElementsVisibility(elements, button, hideText, showText, isInitiallyVisible = true) {
+                let areVisible = isInitiallyVisible;
+                button.textContent = areVisible ? hideText : showText;
+                button.classList.toggle('active', !areVisible); 
+                elements.forEach(element => {
+                    element.style.display = areVisible ? '' : 'none';
+                });
+
+                if (!button.dataset.listenerAttached) {
+                    button.addEventListener('click', () => {
+                        areVisible = !areVisible;
+                        elements.forEach(element => {
+                            element.style.display = areVisible ? '' : 'none';
+                        });
+                        button.textContent = areVisible ? hideText : showText;
+                        button.classList.toggle('active', !areVisible);
+                    });
+                    button.dataset.listenerAttached = 'true'; 
+                }
+            }
+            
+            function getRoleButtonTexts(role) {
+                let roleName = '';
+                let emoji = '';
+                switch (role) {
+                    case 'designer': roleName = 'Designer'; emoji = '🎨'; break;
+                    case 'gerente': roleName = 'Gerente'; emoji = '📋'; break;
+                    case 'apresentador': roleName = 'Apresentador'; emoji = '🎤'; break;
+                    case 'programador': roleName = 'Programador'; emoji = '💻'; break;
+                    default: roleName = role.charAt(0).toUpperCase() + role.slice(1);
+                }
+                return {
+                    hide: `Esconder ${roleName} ${emoji}`,
+                    show: `Mostrar ${roleName} ${emoji}`,
+                    name: `${roleName} ${emoji}`
+                };
+            }
+
+            if (phaseSelector && allPhaseContainers.length > 0) {
+                phaseSelector.addEventListener('change', (event) => {
+                    const selectedPhase = event.target.value;
+                    allPhaseContainers.forEach(container => {
+                        container.style.display = (selectedPhase === 'all' || container.dataset.phase === selectedPhase) ? '' : 'none';
+                    });
+                    roleFilterBtns.forEach(btn => {
+                        const roleToFilter = btn.dataset.role;
+                        const missionCardsForRole = document.querySelectorAll(`#cartoes-missao .mission-card[data-role="${roleToFilter}"]`);
+                        const buttonTexts = getRoleButtonTexts(roleToFilter);
+                        missionCardsForRole.forEach(card => card.style.display = 'none'); 
+                        btn.textContent = buttonTexts.show; 
+                        btn.classList.add('active'); 
+                        btn.dataset.listenerAttached = ''; 
+                        if (missionCardsForRole.length > 0 && !btn.disabled) { 
+                            toggleElementsVisibility(missionCardsForRole, btn, buttonTexts.hide, buttonTexts.show, false);
+                        }
+                    });
+                    const todosMissionCards = document.querySelectorAll('#cartoes-missao .mission-card[data-role="todos"]');
+                    todosMissionCards.forEach(card => {
+                         const parentPhaseContainer = card.closest('.phase-content-wrapper');
+                         if (selectedPhase === 'all' || (parentPhaseContainer && parentPhaseContainer.dataset.phase === selectedPhase)) {
+                            if (parentPhaseContainer && parentPhaseContainer.style.display !== 'none') { 
+                                card.style.display = '';
+                            } else if (!parentPhaseContainer && selectedPhase === 'all') { // For "cooperacao" cards
+                                card.style.display = '';
+                            }
+                         } else {
+                            card.style.display = 'none';
+                         }
+                    });
+                });
+                allPhaseContainers.forEach(container => container.style.display = '');
+            }
+            
+            const todosMissionCards = document.querySelectorAll('#cartoes-missao .mission-card[data-role="todos"]');
+            todosMissionCards.forEach(card => card.style.display = '');
+
+            roleFilterBtns.forEach(btn => {
+                if (btn.dataset.initialized === 'true') return; 
+                btn.dataset.initialized = 'true';
+                const roleToFilter = btn.dataset.role;
+                const missionCardsForRole = document.querySelectorAll(`#cartoes-missao .mission-card[data-role="${roleToFilter}"]`);
+                const buttonTexts = getRoleButtonTexts(roleToFilter);
+                if (missionCardsForRole.length > 0) {
+                    toggleElementsVisibility(missionCardsForRole, btn, buttonTexts.hide, buttonTexts.show, false);
+                } else {
+                    btn.disabled = true;
+                    btn.style.opacity = 0.6;
+                    btn.style.cursor = 'not-allowed';
+                    btn.textContent = `${buttonTexts.name} (Nenhuma)`;
+                }
+            });
+
+            // Placar Turma Filter
+            const turmaSelector = document.getElementById('turma-selector');
+            const placarTableRows = document.querySelectorAll('#placar-tbody tr');
+
+            if (turmaSelector && placarTableRows.length > 0) {
+                turmaSelector.addEventListener('change', (event) => {
+                    const selectedTurma = event.target.value;
+                    placarTableRows.forEach(row => {
+                        if (selectedTurma === 'all' || row.dataset.turma === selectedTurma) {
+                            row.style.display = ''; // Show row
+                        } else {
+                            row.style.display = 'none'; // Hide row
+                        }
+                    });
+                    // Optional: Add visual indication to the select if a filter is active
+                    if (selectedTurma === 'all') {
+                        turmaSelector.classList.remove('active-filter');
+                    } else {
+                        turmaSelector.classList.add('active-filter');
+                    }
+                });
+                 // Initial display for placar: show all turmas
+                placarTableRows.forEach(row => row.style.display = '');
+            }
+
+        });
+    </script>
+</body>
+</html>
